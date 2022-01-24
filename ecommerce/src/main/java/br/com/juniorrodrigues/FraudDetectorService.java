@@ -49,6 +49,7 @@ public class FraudDetectorService {
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectorService.class.getSimpleName());//preciso definir um nome de um grupo de consumo, pq eu posso ter mais de uam api consumindo as mensagens, nesse caso to passando o nome da nossa classe
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, FraudDetectorService.class.getSimpleName()+"-"+ UUID.randomUUID().toString()); //dando um nome para os consumidores, precisa ser id unico pra n gerar bagunça
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1"); //maximo de recods por poll (commiter) no kafka é definido, nesse caso 1 msg por poll, ou seja de uma em uma
         return properties;
     }
 }
