@@ -8,26 +8,31 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class NewOrderMain {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         var producer = new KafkaProducer<String, String>(properties());
-        var value = "1237897898213,5435,77";
-        var record = new ProducerRecord<>("ECOMMERCE_NEW_ORDER", value, value);//passando topico a ser criado no kafka
-        Callback callback = (data, ex) -> {
-            if (ex != null) {
-                ex.printStackTrace();
-                return;
-            }
-            System.out.println("Sucesso enviando " + data.topic() + ":::partition " + data.partition() + "/offset " + data.offset() + "/timestemp " + data.timestamp());
-        };
-        producer.send(record, callback).get();
 
-        var email = "Thank you for your order! We are processing your order!";
-        var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", email,email);
-        producer.send(emailRecord, callback).get();
+        for (var i=0; i<100; i++){
+            var key = UUID.randomUUID().toString();//chave define qual partição vai a mensagem, =aqui usamos o id(id simulado) do user pra isso
+            var value = key+"1237897898213,5435,77";
+            var record = new ProducerRecord<>("ECOMMERCE_NEW_ORDER", key, value);//passando topico a ser criado no kafka
+            Callback callback = (data, ex) -> {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+                System.out.println("Sucesso enviando " + data.topic() + ":::partition " + data.partition() + "/offset " + data.offset() + "/timestemp " + data.timestamp());
+            };
+            producer.send(record, callback).get();
+
+            var email = "Thank you for your order! We are processing your order!";
+            var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", key,email);
+            producer.send(emailRecord, callback).get();
+        }
 
     }
 

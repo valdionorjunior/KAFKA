@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 public class FraudDetectorService {
 //CONSUMIDOR DO KAFKA
@@ -47,6 +48,7 @@ public class FraudDetectorService {
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName()); //de byte pra string
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, FraudDetectorService.class.getSimpleName());//preciso definir um nome de um grupo de consumo, pq eu posso ter mais de uam api consumindo as mensagens, nesse caso to passando o nome da nossa classe
+        properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, FraudDetectorService.class.getSimpleName()+"-"+ UUID.randomUUID().toString()); //dando um nome para os consumidores, precisa ser id unico pra n gerar bagunça
         return properties;
     }
 }
