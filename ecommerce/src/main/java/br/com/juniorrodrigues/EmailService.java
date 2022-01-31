@@ -6,7 +6,7 @@ public class EmailService {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) {
         var emailService = new EmailService();
-        try (var service = new KafkaService(EmailService.class.getSimpleName(),"ECOMMERCE_SEND_EMAIL",emailService::parse)) {
+        try (var service = new KafkaService(EmailService.class.getSimpleName(),"ECOMMERCE_SEND_EMAIL",emailService::parse, String.class)) {
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a nenexão
         }

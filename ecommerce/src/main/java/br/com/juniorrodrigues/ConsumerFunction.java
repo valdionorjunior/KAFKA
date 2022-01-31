@@ -1,7 +1,7 @@
 package br.com.juniorrodrigues;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
-public interface ConsumerFunction {
-    void consume(ConsumerRecord<String, String> record);
+//refector para a interface aceito generics
+public interface ConsumerFunction<T> {
+    void consume(ConsumerRecord<String, T> record);
 }

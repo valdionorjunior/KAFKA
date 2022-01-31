@@ -6,13 +6,13 @@ public class FraudDetectorService {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) {
         var fraudDetectorService = new FraudDetectorService();
-        try (var service = new KafkaService(FraudDetectorService.class.getSimpleName(), "ECOMMERCE_NEW_ORDER", fraudDetectorService::parse)) {
+        try (var service = new KafkaService<>(FraudDetectorService.class.getSimpleName(), "ECOMMERCE_NEW_ORDER", fraudDetectorService::parse, Order.class)) {//incluso o tipo que espero de volta ao deserializar
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
         }
     }
 
-    private void parse(ConsumerRecord<String, String> record) {
+    private void parse(ConsumerRecord<String, Order> record) {
         System.out.println("########################################");
         System.out.println("Processing new order, checking for fraud");
         System.out.println(record.key());
