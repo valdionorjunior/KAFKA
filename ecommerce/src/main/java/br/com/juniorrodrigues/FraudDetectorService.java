@@ -2,11 +2,17 @@ package br.com.juniorrodrigues;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FraudDetectorService {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) {
         var fraudDetectorService = new FraudDetectorService();
-        try (var service = new KafkaService<>(FraudDetectorService.class.getSimpleName(), "ECOMMERCE_NEW_ORDER", fraudDetectorService::parse, Order.class)) {//incluso o tipo que espero de volta ao deserializar
+        try (var service = new KafkaService<>(FraudDetectorService.class.getSimpleName(),
+                "ECOMMERCE_NEW_ORDER",
+                fraudDetectorService::parse,
+                Order.class, Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
         }

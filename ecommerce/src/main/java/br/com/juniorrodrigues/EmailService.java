@@ -2,11 +2,17 @@ package br.com.juniorrodrigues;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.util.HashMap;
+
 public class EmailService {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) {
         var emailService = new EmailService();
-        try (var service = new KafkaService(EmailService.class.getSimpleName(),"ECOMMERCE_SEND_EMAIL",emailService::parse, String.class)) {
+        try (var service = new KafkaService(EmailService.class.getSimpleName(),
+                "ECOMMERCE_SEND_EMAIL",
+                emailService::parse,
+                String.class,
+                new HashMap<>())) {//incluso o tipo que espero de volta ao deserializar no map
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a nenexão
         }

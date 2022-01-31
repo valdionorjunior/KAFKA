@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.io.Closeable;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -15,21 +16,21 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
     private final KafkaConsumer<String, T> consumer;
     private final ConsumerFunction parse;
 
-    KafkaService(String groupId, String topic, ConsumerFunction parse, Class<T> type) {//incluido tipe de volta
-         this(groupId, parse, type);
+    KafkaService(String groupId, String topic, ConsumerFunction parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta / adicionamos um map de propriedade extras para serem passada para serialização
+         this(groupId, parse, type,properties);
         consumer.subscribe(Collections.singletonList(topic)); //consumindo a msg de algum topic,
 //        this.run();
     }
     //segundo construtor
-    KafkaService(String groupId, Pattern topic, ConsumerFunction parse, Class<T> type) {//incluido tipe de volta
-        this(groupId, parse, type);
+    KafkaService(String groupId, Pattern topic, ConsumerFunction parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta
+        this(groupId, parse, type, properties);
         consumer.subscribe(topic); //consumindo a msg de algum topic sob o regex do que esta vindo em string,
 //        this.run();
     }
 
-    private KafkaService(String groupId, ConsumerFunction parse, Class<T> type) {
+    private KafkaService(String groupId, ConsumerFunction parse, Class<T> type, Map<String, String> properties) {
          this.parse= parse;
-        this.consumer = new KafkaConsumer<>(properties(type, groupId));
+        this.consumer = new KafkaConsumer<>(getProperties(type, groupId, properties));
     }
 
     void run() {
@@ -45,7 +46,7 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
         }
     }
 
-    private Properties properties(Class<T> type, String groupId) {
+    private Properties getProperties(Class<T> type, String groupId, Map<String, String> overridProperties) {
         var properties = new Properties();
 
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
@@ -55,6 +56,7 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);//id para grupo diferente para o consumo de msg pra email
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());//client Id
         properties.setProperty(GsonDeserializer.TYPE_CONFIG, type.getName());//criamos uma propriedade na classe GsonDeserializer, para passar o tipo que é o dado pra depois descerializarmos, por padrao via se uma string
+        properties.putAll(overridProperties);//adicionando as propriedade adicionaisque estou repassando.
         return properties;
     }
 
