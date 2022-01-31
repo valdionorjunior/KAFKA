@@ -13,9 +13,9 @@ import java.util.concurrent.ExecutionException;
 /**
  * Classe kafka producer, como existe ja, criei o kafka dispatcher
  * */
-class KafkaDispatcher implements Closeable {//necessario implementar Closeable pra fechar a conexão que foi aberta
+class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeable pra fechar a conexão que foi aberta // implementamos a classe omc generics para poder receber qualquer valor e enviar ao kafka
 
-    private final KafkaProducer<String, String> producer;
+    private final KafkaProducer<String, T> producer;// producer tbm tem que receber um valor de string e valor generico
 
     KafkaDispatcher(){
         this.producer = new KafkaProducer<>(properties());
@@ -25,11 +25,12 @@ class KafkaDispatcher implements Closeable {//necessario implementar Closeable p
         var propertie = new Properties();
         propertie.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         propertie.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+//        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName()); //tranforma String em bites (serialização)
+        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GsonSerializer.class.getName()); //tranforma objetos em json (serialização)
         return propertie;
     }
 
-    void send(String topic, String key, String value) throws ExecutionException, InterruptedException {
+    void send(String topic, String key, T value) throws ExecutionException, InterruptedException {
         var record = new ProducerRecord<>(topic, key, value);//passando topico a ser criado no kafka
         Callback callback = (data, ex) -> {
             if (ex != null) {
