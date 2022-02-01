@@ -14,7 +14,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="service-log" target="15" />
+      <module name="service-logsdas" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>
