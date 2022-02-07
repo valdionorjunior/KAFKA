@@ -54,6 +54,4 @@ public class FraudDetectorService {
     private boolean isaFraud(Order order) {
         return order.getAmount().compareTo(new BigDecimal("4500")) >= 0;
     }
-
-
 }

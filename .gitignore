@@ -141,5 +141,7 @@ replay_pid*
 
 #folder Kafka API
 kafka_2.13-2.8.1*
-#folder permanet path kafka
+#folder permant path kafka
 data*
+#All folder target
+**/target*

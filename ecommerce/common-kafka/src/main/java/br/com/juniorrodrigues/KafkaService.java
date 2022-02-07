@@ -42,10 +42,8 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
                 for (var record : records) {
                     try {
                         parse.consume(record);
-                    } catch (ExecutionException e) {
-                        // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
+                        // Não importa o que aconteça eu quero pegar a proxima mensagem, casos raros em que se usa Excption no consumer
                         // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
                         e.printStackTrace();
                     }
