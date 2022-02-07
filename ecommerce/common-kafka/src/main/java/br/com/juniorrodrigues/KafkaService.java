@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 //refeactor pra classe trabalhar com generics pra desserializar
 class KafkaService<T> implements Closeable {//necessario implementar Closeable pra fechar a coneção que foi aberta
@@ -39,7 +40,15 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
             if (!records.isEmpty()) {
                 System.out.println("Encontrado"+records.count()+" registros");
                 for (var record : records) {
-                    parse.consume(record);
+                    try {
+                        parse.consume(record);
+                    } catch (ExecutionException e) {
+                        // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
+                        e.printStackTrace();
+                    }
                     System.out.println("########################################");
                 }
             }
