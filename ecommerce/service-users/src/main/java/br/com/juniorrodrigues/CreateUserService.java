@@ -16,9 +16,14 @@ public class CreateUserService {
         // aqui no construtor vamos aabrir a conexao com o banco
         String url ="jdbc:sqlite:target/users_database.db";// criando o arquivo dentro do diretotio target do projeto
         this.connection = DriverManager.getConnection(url);
-        connection.createStatement().execute("create table Users (" +
-                "uuid varchar(200) primary key," +
-                "email varchar(200))");
+        try {
+            connection.createStatement().execute("create table Users (" +
+                    "uuid varchar(200) primary key," +
+                    "email varchar(200))");
+        }catch (SQLException ex){
+            // be careful, the sql could be wrong, be really careful
+            ex.printStackTrace();
+        }
     }
 
     // CONSUMIDOR DO KAFKA
@@ -41,13 +46,13 @@ public class CreateUserService {
         // pegando o valor que veio na mensagem
         var order = record.value();
         if(isNewUser(order.getEmail())){
-            insertNewUser(order.getEmail());
+            insertNewUser(order.getUserId(), order.getEmail());
         }
     }
 
-    private void insertNewUser(String email) throws SQLException {
+    private void insertNewUser(String uuid, String email) throws SQLException {
         var insert = connection.prepareStatement("insert into Users(uuid, email) value (?.?)"); //o statement pra manipular o banco, no caso um insert
-        insert.setString(1,"uuid");
+        insert.setString(1,uuid);
         insert.setString(2,"email");
         insert.execute();
         System.out.println("Usuario uuid e "+email+" adicionado.");
