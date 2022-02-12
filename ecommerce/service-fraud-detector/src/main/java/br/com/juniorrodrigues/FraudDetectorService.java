@@ -43,11 +43,11 @@ public class FraudDetectorService {
             //simulando que quando o valor do pedido for >= 4500 vai ser um pedido de rfaude
             System.out.println("Order is a fraud! " + order);
             //enviando mensagem de order com fraude, criando um novo topico caso n exista
-            orderDispatcher.send("ECOMMERCE_ORDER_REJECTED", order.getUserId(), order);
+            orderDispatcher.send("ECOMMERCE_ORDER_REJECTED", order.getEmail(), order);
         }else{
         System.out.println("Aproved: "+ order);
             //enviando mensagem de order aprovada sem fraude, criando um novo topico caso n exista
-            orderDispatcher.send("ECOMMERCE_ORDER_APROVED", order.getUserId(), order);
+            orderDispatcher.send("ECOMMERCE_ORDER_APROVED", order.getEmail(), order);
         }
     }
 
