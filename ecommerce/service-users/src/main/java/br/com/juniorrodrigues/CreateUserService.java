@@ -47,20 +47,20 @@ public class CreateUserService {
         // pegando o valor que veio na mensagem
         var order = record.value();
         if(isNewUser(order.getEmail())){
-            insertNewUser(order.getEmail());
+            insertNewUser(order.getUserId(),order.getEmail());
         }
     }
 
-    private void insertNewUser( String email) throws SQLException {
-        var insert = connection.prepareStatement("insert into Users(uuid, email) value (?.?)"); //o statement pra manipular o banco, no caso um insert
-        insert.setString(1, UUID.randomUUID().toString());//gera novo uuid
-        insert.setString(2,"email");
+    private void insertNewUser( String uuid, String email) throws SQLException {
+        var insert = connection.prepareStatement("insert into Users (uuid, email) values (?,?)"); //o statement pra manipular o banco, no caso um insert
+        insert.setString(1, uuid);//gera novo uuid
+        insert.setString(2, email);
         insert.execute();
         System.out.println("Usuario uuid e "+email+" adicionado.");
     }
 
     private boolean isNewUser(String email) throws SQLException {
-        var exists = connection.prepareStatement("select uuid from Users" +
+        var exists = connection.prepareStatement("select uuid from Users " +
                 "where email = ? limit 1");// traz o usuario pelo uuid onde o email é igual ao que vir, onde sempre trara somente 1 registro
         exists.setString(1, email);
         var result = exists.executeQuery();
