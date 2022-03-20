@@ -47,13 +47,13 @@ public class CreateUserService {
         // pegando o valor que veio na mensagem
         var order = record.value();
         if(isNewUser(order.getEmail())){
-            insertNewUser(order.getUserId(),order.getEmail());
+            insertNewUser(order.getEmail());
         }
     }
 
-    private void insertNewUser( String uuid, String email) throws SQLException {
+    private void insertNewUser( String email) throws SQLException {
         var insert = connection.prepareStatement("insert into Users (uuid, email) values (?,?)"); //o statement pra manipular o banco, no caso um insert
-        insert.setString(1, uuid);//gera novo uuid
+        insert.setString(1, UUID.randomUUID().toString());//gera novo uuid
         insert.setString(2, email);
         insert.execute();
         System.out.println("Usuario uuid e "+email+" adicionado.");

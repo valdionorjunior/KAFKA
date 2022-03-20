@@ -2,7 +2,7 @@ package br.com.juniorrodrigues;
 
 import java.math.BigDecimal;
 
-public class Order {
+public class    Order {
 
     private final String orderId;
     private final BigDecimal amount;
