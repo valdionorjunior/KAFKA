@@ -25,8 +25,11 @@ class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeabl
         var propertie = new Properties();
         propertie.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         propertie.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-//        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName()); //tranforma String em bites (serialização)
-        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GsonSerializer.class.getName()); //tranforma objetos em json (serialização)
+//        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName()); // tranforma String em bites (serialização)
+        propertie.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GsonSerializer.class.getName()); // tranforma objetos em json (serialização)
+        propertie.setProperty(ProducerConfig.ACKS_CONFIG, "all"); /*configuracao para que quando o leader sempre replique tudo para as replicas, é lento, mas da a agarantia que quando ele cair a replica se assumuir esteja equalizada
+        ou seja, vai dar  o ok de que toda a request foi completada, repassando tbm para as replicas, precisa ver as configurações de porametros de ACKS */
+
         return propertie;
     }
 
