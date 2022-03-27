@@ -14,16 +14,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 //refeactor pra classe trabalhar com generics pra desserializar
 class KafkaService<T> implements Closeable {//necessario implementar Closeable pra fechar a coneção que foi aberta
-    private final KafkaConsumer<String, T> consumer;
+    private final KafkaConsumer<String, Message<T>> consumer;
     private final ConsumerFunction parse;
 
-    KafkaService(String groupId, String topic, ConsumerFunction parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta / adicionamos um map de propriedade extras para serem passada para serialização
+    KafkaService(String groupId, String topic, ConsumerFunction<T> parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta / adicionamos um map de propriedade extras para serem passada para serialização
          this(groupId, parse, type,properties);
         consumer.subscribe(Collections.singletonList(topic)); //consumindo a msg de algum topic,
 //        this.run();
     }
     //segundo construtor
-    KafkaService(String groupId, Pattern topic, ConsumerFunction parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta
+    KafkaService(String groupId, Pattern topic, ConsumerFunction<T> parse, Class<T> type, Map<String, String> properties) {//incluido tipe de volta
         this(groupId, parse, type, properties);
         consumer.subscribe(topic); //consumindo a msg de algum topic sob o regex do que esta vindo em string,
 //        this.run();
@@ -62,7 +62,7 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GsonDeserializer.class.getName());//desserializar com GSON -> classe que criamos
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);//id para grupo diferente para o consumo de msg pra email
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());//client Id
-        properties.setProperty(GsonDeserializer.TYPE_CONFIG, type.getName());//criamos uma propriedade na classe GsonDeserializer, para passar o tipo que é o dado pra depois descerializarmos, por padrao via se uma string
+//        properties.setProperty(GsonDeserializer.TYPE_CONFIG, type.getName());//criamos uma propriedade na classe GsonDeserializer, para passar o tipo que é o dado pra depois descerializarmos, por padrao via se uma string
         properties.putAll(overridProperties);//adicionando as propriedade adicionaisque estou repassando.
         return properties;
     }

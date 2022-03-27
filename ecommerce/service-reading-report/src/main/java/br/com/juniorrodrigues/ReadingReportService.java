@@ -25,12 +25,13 @@ public class ReadingReportService {
         }
     }
 
-    private void parse(ConsumerRecord<String, User> record) throws IOException {
+    private void parse(ConsumerRecord<String, Message<User>> record) throws IOException {
         System.out.println("########################################");
         System.out.println("Processing report for " + record.value());
 
         //geração do arquivo de relatorio - atravez do modelo report.txt
-        var user = record.value();
+        var message = record.value();
+        var user = message.getPayload();
         var target = new File(user.getReportPath());
 
         IO.copyTo(SOURCE, target);
