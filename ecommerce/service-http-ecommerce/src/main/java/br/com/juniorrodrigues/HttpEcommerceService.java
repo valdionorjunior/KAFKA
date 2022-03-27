@@ -13,6 +13,8 @@ public class HttpEcommerceService {
         var context = new ServletContextHandler();
         context.setContextPath("/"); // caminho
         context.addServlet(new ServletHolder(new NewOrderServlet()), "/new");
+        // Fast delegaste para enviar mensagens asincronamente pra todos os usuarios
+        context.addServlet(new ServletHolder(new GenerateAllReportsServlet()), "/admin/generete-reports");
 
         server.setHandler(context);
 
