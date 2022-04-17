@@ -1,14 +1,12 @@
 package br.com.juniorrodrigues;
 
-import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.Closeable;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Classe kafka producer, como existe ja, criei o kafka dispatcher
@@ -35,6 +33,11 @@ class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeabl
     }
 
     void send(String topic, String key, CorrelationId id, T payload) throws ExecutionException, InterruptedException {
+        Future<RecordMetadata> future = sendAsync(topic, key, id, payload);
+        future.get();
+    }
+
+    Future<RecordMetadata> sendAsync(String topic, String key, CorrelationId id, T payload) {//envio asincrono
         var value = new Message<>(id, payload);//implementando correlationId + menasge que antes vinha do tipo generico T de forma envelopada
         var record = new ProducerRecord<>(topic, key, value);//passando topico a ser criado no kafka
         Callback callback = (data, ex) -> {
@@ -44,7 +47,7 @@ class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeabl
             }
             System.out.println("Sucesso enviando " + data.topic() + ":::partition " + data.partition() + "/offset " + data.offset() + "/timestemp " + data.timestamp());
         };
-        producer.send(record, callback).get();
+        return  producer.send(record, callback);
     }
 
     @Override
