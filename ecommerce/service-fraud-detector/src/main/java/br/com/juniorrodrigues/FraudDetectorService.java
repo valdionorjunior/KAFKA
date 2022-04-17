@@ -14,7 +14,7 @@ public class FraudDetectorService {
         try (var service = new KafkaService(FraudDetectorService.class.getSimpleName(),
                 "ECOMMERCE_NEW_ORDER",
                 fraudDetectorService::parse,
-                Order.class, Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
+                Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
         }

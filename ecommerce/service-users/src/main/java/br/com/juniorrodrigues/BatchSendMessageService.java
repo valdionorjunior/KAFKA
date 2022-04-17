@@ -34,7 +34,7 @@ public class BatchSendMessageService {
         try (var service = new KafkaService<>(BatchSendMessageService.class.getSimpleName(),
                 "ECOMMERCE_SEND_MESSAGE_TO_ALL_USERS",
                 batchService::parse,
-                String.class, Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
+                Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
             service.run();
             // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
         }
