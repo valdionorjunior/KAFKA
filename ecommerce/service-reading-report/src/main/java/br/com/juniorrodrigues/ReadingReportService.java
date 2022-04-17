@@ -17,7 +17,7 @@ public class ReadingReportService {
     public static void main(String[] args) {
         var readingReportService = new ReadingReportService();
         try (var service = new KafkaService<>(ReadingReportService.class.getSimpleName(),
-                "USER_GERERATE_READING_REPORT",
+                "ECOMMERCE_USER_GERERATE_READING_REPORT",
                 readingReportService::parse,
                 User.class, Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
             service.run();

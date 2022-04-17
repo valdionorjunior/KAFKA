@@ -46,7 +46,7 @@ public class CreateUserService {
         System.out.println(record.value());
 
         // pegando o valor que veio na mensagem
-        var order = message.getPayload();
+        var order = record.value().getPayload();
         if(isNewUser(order.getEmail())){
             insertNewUser(order.getEmail());
         }

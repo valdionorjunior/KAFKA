@@ -36,10 +36,10 @@ public class NewOrderServlet extends HttpServlet {
             var amount = new BigDecimal(req.getParameter("amount")); // numero vindo do parametro da chamada
 
             var order = new Order(orderId, amount, email);
-            orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, order);// passando topico a ser criado no kafka - email como chave
+            orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, new CorrelationId(NewOrderServlet.class.getSimpleName()), order);// passando topico a ser criado no kafka - email como chave
 
             var emailCode= "Thank you for your order! We are processing your order!";// email pra disparo - email como chave
-            emailDispatcher.send("ECOMMERCE_SEND_EMAIL", email, emailCode);
+            emailDispatcher.send("ECOMMERCE_SEND_EMAIL", email, new CorrelationId(NewOrderServlet.class.getSimpleName()), emailCode);
 
             System.out.println("New Order sent sucessfuly!!!");
 

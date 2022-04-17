@@ -16,11 +16,12 @@ import java.util.concurrent.ExecutionException;
 class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeable pra fechar a conexão que foi aberta // implementamos a classe omc generics para poder receber qualquer valor e enviar ao kafka
 
     private final KafkaProducer<String, Message<T>> producer;// producer tbm tem que receber um valor de string e valor generico
-
     KafkaDispatcher(){
         this.producer = new KafkaProducer<>(properties());
     }
-    
+
+
+
     private static Properties properties() {
         var propertie = new Properties();
         propertie.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
@@ -33,8 +34,8 @@ class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeabl
         return propertie;
     }
 
-    void send(String topic, String key, T payload) throws ExecutionException, InterruptedException {
-        var value = new Message<>(new CorrelationId(), payload);//implementando correlationId + menasge que antes vinha do tipo generico T de forma envelopada
+    void send(String topic, String key, CorrelationId id, T payload) throws ExecutionException, InterruptedException {
+        var value = new Message<>(id, payload);//implementando correlationId + menasge que antes vinha do tipo generico T de forma envelopada
         var record = new ProducerRecord<>(topic, key, value);//passando topico a ser criado no kafka
         Callback callback = (data, ex) -> {
             if (ex != null) {

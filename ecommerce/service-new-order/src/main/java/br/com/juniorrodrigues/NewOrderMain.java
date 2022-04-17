@@ -16,10 +16,10 @@ public class NewOrderMain {
                     var amount = new BigDecimal(Math.random() * 5000 + 1); //numero entre 0 e 5000 mas que seja pelo menos onumero 1
 
                     var order = new Order(orderId, amount, email);
-                    orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, order);//passando topico a ser criado no kafka - email como chave
+                    orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, new CorrelationId(NewOrderMain.class.getSimpleName()), order);//passando topico a ser criado no kafka - email como chave
 
                     var emailCode= "Thank you for your order! We are processing your order!";//email pra disparo - email como chave
-                    emailDispatcher.send("ECOMMERCE_SEND_EMAIL", email, emailCode);
+                    emailDispatcher.send("ECOMMERCE_SEND_EMAIL", email, new CorrelationId(NewOrderMain.class.getSimpleName()), emailCode);
                 }
                 // try tenta executar o codigo se n conseguie, o KafkaDispatcher  fecha a conexão
             }
