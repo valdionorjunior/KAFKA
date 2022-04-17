@@ -14,7 +14,7 @@ public class ReadingReportService {
 
 
 //CONSUMIDOR DO KAFKA
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         var readingReportService = new ReadingReportService();
         try (var service = new KafkaService<>(ReadingReportService.class.getSimpleName(),
                 "ECOMMERCE_USER_GERERATE_READING_REPORT",

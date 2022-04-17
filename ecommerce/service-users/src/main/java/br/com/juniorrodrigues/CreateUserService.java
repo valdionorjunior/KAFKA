@@ -28,7 +28,7 @@ public class CreateUserService {
     }
 
     // CONSUMIDOR DO KAFKA
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException, SQLException {
         var createUserService = new CreateUserService();
         try (var service = new KafkaService<>(CreateUserService.class.getSimpleName(),
                 "ECOMMERCE_NEW_ORDER",

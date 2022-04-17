@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+
 //refeactor pra classe trabalhar com generics pra desserializar
 class KafkaService<T> implements Closeable {//necessario implementar Closeable pra fechar a coneção que foi aberta
     private final KafkaConsumer<String, Message<T>> consumer;
@@ -34,20 +35,32 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
         this.consumer = new KafkaConsumer<>(getProperties( groupId, properties));
     }
 
-    void run() {
-        while (true) {
-            var records = consumer.poll(Duration.ofMillis(100));// verificando se tem msg no topico por algum tempo (100 milisec)
-            if (!records.isEmpty()) {
-                System.out.println("Encontrado"+records.count()+" registros");
-                for (var record : records) {
-                    try {
-                        parse.consume(record);
-                    } catch (Exception e) {
-                        // Não importa o que aconteça eu quero pegar a proxima mensagem, casos raros em que se usa Excption no consumer
-                        // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
-                        e.printStackTrace();
+    void run() throws ExecutionException, InterruptedException {
+        //criando um novo dispatcher
+        try(var deadLetter = new KafkaDispatcher<>()) {
+            while (true) {
+                var records = consumer.poll(Duration.ofMillis(100));// verificando se tem msg no topico por algum tempo (100 milisec)
+                if (!records.isEmpty()) {
+                    System.out.println("Registros encontrados: " + records.count());
+                    for (var record : records) {
+                        try {
+                            parse.consume(record);
+                        } catch (Exception e) {
+                            // Não importa o que aconteça eu quero pegar a proxima mensagem, casos raros em que se usa Excption no consumer
+                            // aqui por enquanto apenas logar as mensagens de execption para n para o serviço
+                            e.printStackTrace();
+                            // Tratando erros de consumo de mesngem
+                            // envia uma mensagem pro topico dizendo que deu erro ao consumir
+                            var message = record.value();
+                            //cria um novo dispatcher
+                            deadLetter.send("ECOMMERCE_DEADLETTER",
+                                    message.getId().toString(), //correlationId da mensagem que deu erro
+                                    message.getId().continueWith("DeadLetter"), // cria um id novo pra menseage de emvio que deu erro para saber qua lé a mensagem com erro
+                                    new GsonSerializer().serialize("", message) // mensagen pode ser de qualquer tipo por isso passo um Gson serializer generico resializando a mensagem
+                            );
+                        }
+                        System.out.println("########################################");
                     }
-                    System.out.println("########################################");
                 }
             }
         }
