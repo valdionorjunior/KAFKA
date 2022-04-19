@@ -1,5 +1,6 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.consumer.KafkaService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.HashMap;

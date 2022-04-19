@@ -1,9 +1,10 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.consumer.KafkaService;
+import br.com.juniorrodrigues.dispatcher.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 

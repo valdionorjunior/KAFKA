@@ -1,5 +1,7 @@
-package br.com.juniorrodrigues;
+package br.com.juniorrodrigues.consumer;
 
+import br.com.juniorrodrigues.Message;
+import br.com.juniorrodrigues.MessageAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.kafka.common.serialization.Deserializer;

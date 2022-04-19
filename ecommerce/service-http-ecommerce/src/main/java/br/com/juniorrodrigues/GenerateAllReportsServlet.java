@@ -1,5 +1,6 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.dispatcher.KafkaDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

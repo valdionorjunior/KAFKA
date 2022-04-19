@@ -1,5 +1,7 @@
-package br.com.juniorrodrigues;
+package br.com.juniorrodrigues.dispatcher;
 
+import br.com.juniorrodrigues.CorrelationId;
+import br.com.juniorrodrigues.Message;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -11,10 +13,10 @@ import java.util.concurrent.Future;
 /**
  * Classe kafka producer, como existe ja, criei o kafka dispatcher
  * */
-class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeable pra fechar a conexão que foi aberta // implementamos a classe omc generics para poder receber qualquer valor e enviar ao kafka
+public class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeable pra fechar a conexão que foi aberta // implementamos a classe omc generics para poder receber qualquer valor e enviar ao kafka
 
     private final KafkaProducer<String, Message<T>> producer;// producer tbm tem que receber um valor de string e valor generico
-    KafkaDispatcher(){
+    public KafkaDispatcher(){
         this.producer = new KafkaProducer<>(properties());
     }
 
@@ -32,13 +34,13 @@ class KafkaDispatcher<T> implements Closeable {//necessario implementar Closeabl
         return propertie;
     }
 
-    void send(String topic, String key, CorrelationId id, T payload) throws ExecutionException, InterruptedException {
+    public void send(String topic, String key, CorrelationId id, T payload) throws ExecutionException, InterruptedException {
         Future<RecordMetadata> future = sendAsync(topic, key, id, payload);
         future.get();
     }
 
-    Future<RecordMetadata> sendAsync(String topic, String key, CorrelationId id, T payload) {//envio asincrono
-        var value = new Message<>(id, payload);//implementando correlationId + menasge que antes vinha do tipo generico T de forma envelopada
+    public Future<RecordMetadata> sendAsync(String topic, String key, CorrelationId id, T payload) {//envio asincrono
+        var value = new Message<>(id.continueWith("_"+topic), payload);//implementando correlationId + menasge que antes vinha do tipo generico T de forma envelopada
         var record = new ProducerRecord<>(topic, key, value);//passando topico a ser criado no kafka
         Callback callback = (data, ex) -> {
             if (ex != null) {

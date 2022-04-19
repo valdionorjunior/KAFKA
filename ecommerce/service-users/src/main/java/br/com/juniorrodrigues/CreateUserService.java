@@ -1,8 +1,8 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.consumer.KafkaService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.beans.DesignMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

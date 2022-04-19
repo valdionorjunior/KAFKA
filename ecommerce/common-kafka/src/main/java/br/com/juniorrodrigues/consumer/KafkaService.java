@@ -1,5 +1,8 @@
-package br.com.juniorrodrigues;
+package br.com.juniorrodrigues.consumer;
 
+import br.com.juniorrodrigues.Message;
+import br.com.juniorrodrigues.dispatcher.GsonSerializer;
+import br.com.juniorrodrigues.dispatcher.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,17 +17,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 //refeactor pra classe trabalhar com generics pra desserializar
-class KafkaService<T> implements Closeable {//necessario implementar Closeable pra fechar a coneção que foi aberta
+public class KafkaService<T> implements Closeable {//necessario implementar Closeable pra fechar a coneção que foi aberta
     private final KafkaConsumer<String, Message<T>> consumer;
     private final ConsumerFunction parse;
 
-    KafkaService(String groupId, String topic, ConsumerFunction<T> parse, Map<String, String> properties) {//incluido tipe de volta / adicionamos um map de propriedade extras para serem passada para serialização
+    public KafkaService(String groupId, String topic, ConsumerFunction<T> parse, Map<String, String> properties) {//incluido tipe de volta / adicionamos um map de propriedade extras para serem passada para serialização
          this(groupId, parse,properties);
         consumer.subscribe(Collections.singletonList(topic)); //consumindo a msg de algum topic,
 //        this.run();
     }
     //segundo construtor
-    KafkaService(String groupId, Pattern topic, ConsumerFunction<T> parse, Map<String, String> properties) {//incluido tipe de volta
+     public KafkaService(String groupId, Pattern topic, ConsumerFunction<T> parse, Map<String, String> properties) {//incluido tipe de volta
         this(groupId, parse, properties);
         consumer.subscribe(topic); //consumindo a msg de algum topic sob o regex do que esta vindo em string,
 //        this.run();
@@ -35,7 +38,7 @@ class KafkaService<T> implements Closeable {//necessario implementar Closeable p
         this.consumer = new KafkaConsumer<>(getProperties( groupId, properties));
     }
 
-    void run() throws ExecutionException, InterruptedException {
+    public void run() throws ExecutionException, InterruptedException {
         //criando um novo dispatcher
         try(var deadLetter = new KafkaDispatcher<>()) {
             while (true) {
