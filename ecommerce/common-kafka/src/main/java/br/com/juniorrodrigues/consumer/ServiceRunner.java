@@ -1,4 +1,4 @@
-package br.com.juniorrodrigues;
+package br.com.juniorrodrigues.consumer;
 
 import java.util.concurrent.Executors;
 

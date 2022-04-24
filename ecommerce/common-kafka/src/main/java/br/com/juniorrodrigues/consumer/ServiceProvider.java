@@ -1,11 +1,8 @@
-package br.com.juniorrodrigues;
-
-import br.com.juniorrodrigues.consumer.KafkaService;
+package br.com.juniorrodrigues.consumer;
 
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 
 public class ServiceProvider<T> implements Callable<Void> { // fazendo rodar varia vezes  - Callable é do tipo V, to fazendo ele devolver um <Void>
     private final ServiceFactory<T> factory;

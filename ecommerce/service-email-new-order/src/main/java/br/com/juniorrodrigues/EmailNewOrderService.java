@@ -1,29 +1,30 @@
 package br.com.juniorrodrigues;
 
-import br.com.juniorrodrigues.consumer.KafkaService;
+import br.com.juniorrodrigues.consumer.ConsumerService;
+import br.com.juniorrodrigues.consumer.ServiceRunner;
 import br.com.juniorrodrigues.dispatcher.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.math.BigDecimal;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class EmailNewOrderService {
+public class EmailNewOrderService implements ConsumerService<Order> {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var emailService = new EmailNewOrderService();
-        try (var service = new KafkaService(EmailNewOrderService.class.getSimpleName(),
-                "ECOMMERCE_NEW_ORDER",
-                emailService::parse,
-                Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
-            service.run();
-            // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
-        }
+        // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
+        new ServiceRunner(EmailNewOrderService::new).start(5);// pasando o numero de threads que quero que ele rode
     }
+    public String getConsumerGroup() {
+        return EmailNewOrderService.class.getSimpleName();
+    }
+
+    public String getTopic() {
+        return "ECOMMERCE_NEW_ORDER";
+    }
+
     //enviar mensagme tbm agora
     private final KafkaDispatcher<String> emailDispatcher = new KafkaDispatcher<>();
 
-    private void parse(ConsumerRecord<String, Message<Order>> record) throws ExecutionException, InterruptedException {
+    public void parse(ConsumerRecord<String, Message<Order>> record) throws ExecutionException, InterruptedException {
         System.out.println("########################################");
         System.out.println("Processing new order, prepering email.");
         var message = record.value();

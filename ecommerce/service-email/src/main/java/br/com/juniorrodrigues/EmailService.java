@@ -1,5 +1,7 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.consumer.ConsumerService;
+import br.com.juniorrodrigues.consumer.ServiceRunner;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 public class EmailService implements ConsumerService<String> {

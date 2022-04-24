@@ -1,29 +1,31 @@
 package br.com.juniorrodrigues;
 
-import br.com.juniorrodrigues.consumer.KafkaService;
+import br.com.juniorrodrigues.consumer.ConsumerService;
+import br.com.juniorrodrigues.consumer.ServiceRunner;
 import br.com.juniorrodrigues.dispatcher.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class FraudDetectorService {
+public class FraudDetectorService implements ConsumerService<Order> {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var fraudDetectorService = new FraudDetectorService();
-        try (var service = new KafkaService(FraudDetectorService.class.getSimpleName(),
-                "ECOMMERCE_NEW_ORDER",
-                fraudDetectorService::parse,
-                Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
-            service.run();
-            // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
-        }
+    // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
+        new ServiceRunner(FraudDetectorService::new).start(5);// pasando o numero de threads que quero que ele rode
+    }
+
+    public String getConsumerGroup() {
+        return FraudDetectorService.class.getSimpleName();
+    }
+
+    public String getTopic() {
+        return "ECOMMERCE_NEW_ORDER";
     }
     //enviar mensagme tbm agora
     private final KafkaDispatcher<Order> orderDispatcher = new KafkaDispatcher<>();
 
-    private void parse(ConsumerRecord<String, Message<Order>> record) throws ExecutionException, InterruptedException {
+    public void parse(ConsumerRecord<String, Message<Order>> record) throws ExecutionException, InterruptedException {
         System.out.println("########################################");
         System.out.println("Processing new order, checking for fraud");
         System.out.println(record.key());

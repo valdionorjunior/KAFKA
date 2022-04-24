@@ -1,28 +1,28 @@
 package br.com.juniorrodrigues;
 
-import br.com.juniorrodrigues.consumer.KafkaService;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import br.com.juniorrodrigues.consumer.ConsumerService;
+import br.com.juniorrodrigues.consumer.ServiceRunner;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
-public class LogService {
+public class LogService implements ConsumerService<String> {
 //CONSUMIDOR DO KAFKA
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var logService = new LogService();
-        try (var service = new KafkaService(LogService.class.getSimpleName(),
-                Pattern.compile("ECOMMERCE.*"),
-                logService::parse,
-                Map.of(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName()))) {
-            service.run();
-            // try tenta executar o codigo se n conseguie, o kafka service fecha a nenexão
-        }
+    public static void main(String[] args){
+        // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
+        new ServiceRunner(LogService::new).start(5);// pasando o numero de threads que quero que ele rode
+
     }
 
-    private void parse(ConsumerRecord<String, Message<String>> record) {
+    public String getConsumerGroup() {
+        return LogService.class.getSimpleName();
+    }
+
+    public String getTopic() {
+        return String.valueOf(Pattern.compile("ECOMMERCE.*"));
+    }
+
+    public void parse(ConsumerRecord<String, Message<String>> record) {
 
         System.out.println("########################################");
         System.out.println("LOG: " + record.topic());//nome do topico de onde veio a msg
