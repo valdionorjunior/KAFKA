@@ -1,16 +1,13 @@
 package br.com.juniorrodrigues;
 
-import br.com.juniorrodrigues.consumer.KafkaService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
-import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 public class EmailService implements ConsumerService<String> {
 //CONSUMIDOR DO KAFKA
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        // rodando varios emails services, atraz do run do provider, falando qual a function que cria um email service
-        new ServiceProvider().run(EmailService::new);
+    public static void main(String[] args){
+        // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
+        new ServiceRunner(EmailService::new).start(5);// pasando o numero de threads que quero que ele rode
+
     }
 
     public String getConsumerGroup() {
