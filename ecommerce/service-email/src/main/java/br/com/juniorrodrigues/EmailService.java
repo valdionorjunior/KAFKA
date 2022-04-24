@@ -6,20 +6,22 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-public class EmailService {
+public class EmailService implements ConsumerService<String> {
 //CONSUMIDOR DO KAFKA
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var emailService = new EmailService();
-        try (var service = new KafkaService(EmailService.class.getSimpleName(),
-                "ECOMMERCE_SEND_EMAIL",
-                emailService::parse,
-                new HashMap<>())) {//incluso o tipo que espero de volta ao deserializar no map
-            service.run();
-            // try tenta executar o codigo se n conseguie, o kafka service fecha a nenexão
-        }
+        // rodando varios emails services, atraz do run do provider, falando qual a function que cria um email service
+        new ServiceProvider().run(EmailService::new);
     }
 
-    private void parse(ConsumerRecord<String, Message<String>> record) {
+    public String getConsumerGroup() {
+        return EmailService.class.getSimpleName();
+    }
+
+    public String getTopic() {
+        return "ECOMMERCE_SEND_EMAIL";
+    }
+
+    public void parse(ConsumerRecord<String, Message<String>> record) {
         System.out.println("########################################");
         System.out.println("Send email.");
         System.out.println(record.key());
