@@ -80,6 +80,8 @@ public class KafkaService<T> implements Closeable {//necessario implementar Clos
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());//client Id
 //        properties.setProperty(GsonDeserializer.TYPE_CONFIG, type.getName());//criamos uma propriedade na classe GsonDeserializer, para passar o tipo que é o dado pra depois descerializarmos, por padrao via se uma string
         properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");//definindo o numero maximo de consumo de mensagens por vez, nesse caso aqui 1
+        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"); // ajusta quando n tem offset inicial, ou n existe mais offset no servidor, por padrao ele começa do ultimo, largest significa o qeu es estavamos fazendo
+        //AUTO_OFFSET_RESET_CONFIG - cuidado, essa config pode ser diferente para versoes diferentes do kafka
         properties.putAll(overridProperties);//adicionando as propriedade adicionaisque estou repassando.
         return properties;
     }
