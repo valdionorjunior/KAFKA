@@ -2,7 +2,6 @@ package br.com.juniorrodrigues.consumer;
 
 import java.util.HashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 public class ServiceProvider<T> implements Callable<Void> { // fazendo rodar varia vezes  - Callable é do tipo V, to fazendo ele devolver um <Void>
     private final ServiceFactory<T> factory;
@@ -10,7 +9,7 @@ public class ServiceProvider<T> implements Callable<Void> { // fazendo rodar var
         this.factory = factory;
     }
 
-    public Void call() throws ExecutionException, InterruptedException {
+    public Void call() throws Exception {
         var myService = factory.create(); // quando ela cria, devolve o email service
         try (var service = new KafkaService(myService.getConsumerGroup(),
                 myService.getTopic(),

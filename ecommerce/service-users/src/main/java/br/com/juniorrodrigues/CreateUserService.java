@@ -1,6 +1,8 @@
 package br.com.juniorrodrigues;
 
+import br.com.juniorrodrigues.consumer.ConsumerService;
 import br.com.juniorrodrigues.consumer.KafkaService;
+import br.com.juniorrodrigues.consumer.ServiceRunner;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.sql.Connection;
@@ -10,10 +12,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-public class CreateUserService {
+public class CreateUserService implements ConsumerService<Order> {
     private final Connection connection;
     // Assumindo que esse serviço via dor uma unica vez, criarei uma conexão com o um banco de dados pra salvar aas informçeos
-    public CreateUserService() throws SQLException {
+    private CreateUserService() throws SQLException {
         // aqui no construtor vamos aabrir a conexao com o banco
         String url ="jdbc:sqlite:target/users_database.db";// criando o arquivo dentro do diretotio target do projeto
         this.connection = DriverManager.getConnection(url);
@@ -27,19 +29,23 @@ public class CreateUserService {
         }
     }
 
-    // CONSUMIDOR DO KAFKA
-    public static void main(String[] args) throws ExecutionException, InterruptedException, SQLException {
-        var createUserService = new CreateUserService();
-        try (var service = new KafkaService<>(CreateUserService.class.getSimpleName(),
-                "ECOMMERCE_NEW_ORDER",
-                createUserService::parse,
-                Map.of())) {//incluso o tipo que espero de volta ao deserializar no map
-            service.run();
-            // try tenta executar o codigo se n conseguie, o kafka service fecha a conexão
-        }
+    @Override
+    public String getConsumerGroup() {
+        return CreateUserService.class.getSimpleName();
     }
 
-    private void parse(ConsumerRecord<String, Message<Order>> record) throws ExecutionException, InterruptedException, SQLException {
+    @Override
+    public String getTopic() {
+        return "ECOMMERCE_NEW_ORDER";
+    }
+
+    // CONSUMIDOR DO KAFKA
+    public static void main(String[] args) {
+        // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
+        new ServiceRunner<>(CreateUserService::new).start(1);// pasando o numero de threads que quero que ele rode, aqu item q ser 1 por thread pq é conection com banco
+    }
+
+    public void parse(ConsumerRecord<String, Message<Order>> record) throws SQLException {
         var message = record.value();
         System.out.println("########################################");
         System.out.println("Processing new order, checking for new user");
@@ -54,10 +60,11 @@ public class CreateUserService {
 
     private void insertNewUser( String email) throws SQLException {
         var insert = connection.prepareStatement("insert into Users (uuid, email) values (?,?)"); //o statement pra manipular o banco, no caso um insert
-        insert.setString(1, UUID.randomUUID().toString());//gera novo uuid
+        var uuid = UUID.randomUUID().toString();
+        insert.setString(1, uuid);//gera novo uuid
         insert.setString(2, email);
         insert.execute();
-        System.out.println("Usuario uuid e "+email+" adicionado.");
+        System.out.println("Usuario "+ uuid +" e "+email+" adicionado.");
     }
 
     private boolean isNewUser(String email) throws SQLException {

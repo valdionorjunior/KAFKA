@@ -17,11 +17,11 @@ public class ReadingReportService implements ConsumerService<User> {
         // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
         new ServiceRunner(ReadingReportService::new).start(5);// pasando o numero de threads que quero que ele rode
     }
-
+    @Override
     public String getConsumerGroup() {
         return ReadingReportService.class.getSimpleName();
     }
-
+    @Override
     public String getTopic() {
         return "ECOMMERCE_USER_GERERATE_READING_REPORT";
     }

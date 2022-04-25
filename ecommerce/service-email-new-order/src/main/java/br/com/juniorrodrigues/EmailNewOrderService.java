@@ -14,10 +14,11 @@ public class EmailNewOrderService implements ConsumerService<Order> {
         new ServiceRunner(EmailNewOrderService::new).start(1);// pasando o numero de threads que quero que ele rode
     }
 
+    @Override
     public String getConsumerGroup() {
         return EmailNewOrderService.class.getSimpleName();
     }
-
+    @Override
     public String getTopic() {
         return "ECOMMERCE_NEW_ORDER";
     }

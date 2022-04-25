@@ -13,11 +13,11 @@ public class LogService implements ConsumerService<String> {
         new ServiceRunner(LogService::new).start(5);// pasando o numero de threads que quero que ele rode
 
     }
-
+    @Override
     public String getConsumerGroup() {
         return LogService.class.getSimpleName();
     }
-
+    @Override
     public String getTopic() {
         return String.valueOf(Pattern.compile("ECOMMERCE.*"));
     }

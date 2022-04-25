@@ -11,11 +11,11 @@ public class EmailService implements ConsumerService<String> {
         new ServiceRunner(EmailService::new).start(5);// pasando o numero de threads que quero que ele rode
 
     }
-
+    @Override
     public String getConsumerGroup() {
         return EmailService.class.getSimpleName();
     }
-
+    @Override
     public String getTopic() {
         return "ECOMMERCE_SEND_EMAIL";
     }
