@@ -9,10 +9,11 @@ import java.util.concurrent.ExecutionException;
 
 public class EmailNewOrderService implements ConsumerService<Order> {
 //CONSUMIDOR DO KAFKA
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args){
         // rodando varios emails services, atravez do call do provider, falando qual a function que cria um email service
         new ServiceRunner(EmailNewOrderService::new).start(5);// pasando o numero de threads que quero que ele rode
     }
+
     public String getConsumerGroup() {
         return EmailNewOrderService.class.getSimpleName();
     }
