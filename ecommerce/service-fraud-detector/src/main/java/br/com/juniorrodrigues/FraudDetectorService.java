@@ -10,8 +10,8 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
 public class FraudDetectorService implements ConsumerService<Order> {
-    private final LocalDatabase database;
 //CONSUMIDOR DO KAFKA
+    private final LocalDatabase database;
 
     public FraudDetectorService() throws SQLException {
         this.database = new LocalDatabase("frauds_database");

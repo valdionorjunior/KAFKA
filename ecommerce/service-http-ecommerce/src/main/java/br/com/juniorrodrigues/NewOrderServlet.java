@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -30,22 +31,31 @@ public class NewOrderServlet extends HttpServlet {
             var email = req.getParameter("email");
 
             //criando pedidos
-            var orderId = UUID.randomUUID().toString();// id do pedido
+//            var orderId = UUID.randomUUID().toString();// id do pedido
+            var orderId = req.getParameter("uuid");
             var amount = new BigDecimal(req.getParameter("amount")); // numero vindo do parametro da chamada
 
             var order = new Order(orderId, amount, email);
-            orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, new CorrelationId(NewOrderServlet.class.getSimpleName()), order);// passando topico a ser criado no kafka - email como chave
 
-            System.out.println("New Order sent sucessfuly!!!");
+            // to criando e fechando a conexão como banco a cad areques pq e´local, somente para fins de estudo
 
-            // status Code de resposta
-            resp.setStatus(HttpServletResponse.SC_OK);
-            // enviando reposta pra chamada http
-            resp.getWriter().println("New Order sent!");
+            try (var database = new OrdersDatabase()) {
+                if (database.saveNew(order)) {
+                    orderDispatcher.send("ECOMMERCE_NEW_ORDER", email, new CorrelationId(NewOrderServlet.class.getSimpleName()), order);// passando topico a ser criado no kafka - email como chave
+                    System.out.println("New Order sent sucessfuly!!!");
 
-        } catch (ExecutionException e) {
-            throw new ServletException(e);
-        } catch (InterruptedException e) {
+                    // status Code de resposta
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    // enviando reposta pra chamada http
+                    resp.getWriter().println("New Order sent!");
+                } else {
+                    System.out.println("Old Order received!!!");
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.getWriter().println("Old Order received!");
+                }
+            }
+
+        } catch (ExecutionException| InterruptedException | SQLException e) {
             throw new ServletException(e);
         }
 
